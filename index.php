@@ -4,22 +4,20 @@ $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
+    $email = trim($_POST['email'] ?? '');
+    $password = trim($_POST['password'] ?? '');
 
     $supabase_url = "https://uhqqlzpaybcyxrepisgi.supabase.co/rest/v1/login";
     $api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocXF6bHBheWJjeXhyZXBpc2dpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDg0MDI3OCwiZXhwIjoyMDg2NDE2Mjc4fQ.zgY2AsO71vrf5V1lWW0J35nUtut1qUvfvGTRAHFRz7Y
-"; // <-- Mets ta publishable key ici
+"; // mets ta vraie clé ici
 
     $query = $supabase_url . "?email=eq." . urlencode($email) . "&password=eq." . urlencode($password);
 
     $ch = curl_init($query);
-
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "apikey: $api_key",
-        "Authorization: Bearer $api_key",
-        "Content-Type: application/json"
+        "Authorization: Bearer $api_key"
     ]);
 
     $response = curl_exec($ch);
@@ -27,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $data = json_decode($response, true);
 
-    if (!empty($data)) {
+    if (is_array($data) && count($data) > 0) {
         $success = "Login successful ✅";
     } else {
         $error = "Invalid email or password ❌";
@@ -132,3 +130,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 </body>
 </html>
+
