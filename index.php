@@ -21,6 +21,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     ]);
 
     $response = curl_exec($ch);
+    echo $response;
+    exit();
     curl_close($ch);
 
     $data = json_decode($response, true);
@@ -130,4 +132,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 </body>
 </html>
+
 
