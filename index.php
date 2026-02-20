@@ -1,33 +1,39 @@
 <?php
 session_start();
 
-$email = $_POST['email'];
-$password = $_POST['password'];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-$supabase_url = "https://uhqqzlpaybcyxrepisgi.supabase.co";
-$api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocXF6bHBheWJjeXhyZXBpc2dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDAyNzgsImV4cCI6MjA4NjQxNjI3OH0.LNQMIQs7euI7-4MMJWU_maqT6WdXq6lWuueCtF3kE24";
+    $email = $_POST['email'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-$headers = [
-    "apikey: $api_key",
-    "Authorization: Bearer $api_key"
-];
+    $supabase_url = "https://uhqqzlpaybcyxrepisgi.supabase.co/rest/v1/login";
+    $api_key = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocXF6bHBheWJjeXhyZXBpc2dpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDg0MDI3OCwiZXhwIjoyMDg2NDE2Mjc4fQ.zgY2AsO71vrf5V1lWW0J35nUtut1qUvfvGTRAHFRz7Y
 
-$query = "?email=eq.$email&password=eq.$password";
+";
 
-$ch = curl_init($supabase_url . $query);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    $headers = [
+        "apikey: $api_key",
+        "Authorization: Bearer $api_key"
+    ];
 
-$response = curl_exec($ch);
-curl_close($ch);
+    $query = "?email=eq.$email&password=eq.$password";
 
-$data = json_decode($response, true);
+    $ch = curl_init($supabase_url . $query);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-if (!empty($data)) {
-    $_SESSION['email'] = $email;
-    header("Location: dashboard.php");
-} else {
-    header("Location: index.php");
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    $data = json_decode($response, true);
+
+    if (!empty($data)) {
+        $_SESSION['email'] = $email;
+        header("Location: dashboard.php");
+        exit();
+    } else {
+        header("Location: index.php");
+        exit();
+    }
 }
-exit();
 ?>
