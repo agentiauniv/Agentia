@@ -100,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <div class="w-full max-w-lg p-8 sm:p-10 rounded-2xl shadow-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
 
-                <form id="loginForm" method="POST" action="index.php#/login" class="space-y-6">
+                <form id="loginForm" method="POST" action="index.php" class="space-y-6">
 
                     <div>
                         <label class="block text-sm font-medium mb-2 text-slate-500 dark:text-slate-400">
@@ -132,5 +132,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 </body>
 </html>
+
 
 
