@@ -1,196 +1,96 @@
 <?php
 session_start();
 
+$success = "";
+$error = "";
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    $supabase_url = "https://uhqqzlpaybcyxrepisgi.supabase.co/rest/v1/login";
-    $api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocXF6bHBheWJjeXhyZXBpc2dpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDg0MDI3OCwiZXhwIjoyMDg2NDE2Mjc4fQ.zgY2AsO71vrf5V1lWW0J35nUtut1qUvfvGTRAHFRz7Y
-";
+    if (!empty($email) && !empty($password)) {
 
-    $headers = [
-        "apikey: $api_key",
-        "Authorization: Bearer $api_key"
-    ];
+$supabase_url = "https://uhqqlzpaybcyxrepisgi.supabase.co/rest/v1/login";
+$api_key = "sb_publishable_8zJ55HCmtuFhw1ClkAed2g_NdQ1GNqZ";
 
-    $query = "?email=eq.$email&password=eq.$password";
+        $query = "?email=eq." . urlencode($email) . "&password=eq." . urlencode($password);
 
-    $ch = curl_init($supabase_url . $query);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $ch = curl_init($supabase_url . $query);
 
-    $response = curl_exec($ch);
-    curl_close($ch);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "apikey: $api_key",
+            "Authorization: Bearer $api_key",
+            "Content-Type: application/json"
+        ]);
 
-    $data = json_decode($response, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
 
-    if (!empty($data)) {
-        $_SESSION['email'] = $email;
-        header("Location: dashboard.php");
-        exit();
+        $data = json_decode($response, true);
+
+        if (!empty($data)) {
+            $success = "Connexion réussie ✅";
+        } else {
+            $error = "Email ou mot de passe incorrect ❌";
+        }
     } else {
-        $error = "Email ou mot de passe incorrect";
+        $error = "Veuillez remplir tous les champs ❌";
     }
 }
-?><!DOCTYPE html>
+?>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniMate | Academic Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              display: ['"Public Sans"', 'sans-serif'],
-            },
-          }
-        }
-      }
-    </script>
-    <link rel="stylesheet" href="main.css">
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/"
-  }
-}
-</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniMate Login</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-200 min-h-screen transition-colors duration-500">
 
-    <!-- Navbar -->
-    <nav class="fixed top-0 left-0 right-0 z-[100] navbar-blur border-b border-slate-200 dark:border-slate-800">
-      <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href="#/" class="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-          <div class="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm">
-             <i class="fa-solid fa-graduation-cap text-base"></i>
-          </div>
-          <span class="text-xl font-display font-bold tracking-tight text-slate-900 dark:text-white">UniMate</span>
-        </a>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center">
 
-        <div class="flex items-center gap-4">
-          <button id="theme-toggle" class="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-            <i id="theme-icon" class="fa-solid fa-moon text-slate-500 dark:text-amber-400"></i>
-          </button>
-          <div class="h-5 w-px bg-slate-200 dark:border-slate-800 mx-1"></div>
-          <!-- هذا الزر سيتغير حسب الصفحة بواسطة JavaScript -->
-          <a id="nav-login-btn" href="#/login" class="px-5 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[12px] font-bold rounded-lg uppercase tracking-wider hover:opacity-90 transition-opacity">
-            LOG IN
-          </a>
-        </div>
-      </div>
-    </nav>
+<div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
 
-    <!-- Content Container -->
-    <div id="view-container">
-        <!-- Content injected by main.js -->
+<h2 class="text-2xl font-bold mb-6 text-center">Student Portal</h2>
+
+<?php if (!empty($success)): ?>
+    <div class="bg-green-100 text-green-700 p-3 rounded mb-4 text-center">
+        <?php echo $success; ?>
+    </div>
+<?php endif; ?>
+
+<?php if (!empty($error)): ?>
+    <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-center">
+        <?php echo $error; ?>
+    </div>
+<?php endif; ?>
+
+<form method="POST" action="" class="space-y-4">
+
+    <div>
+        <label class="block mb-1 text-sm font-medium">University Email</label>
+        <input type="email" name="email" required
+               class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
     </div>
 
-    <!-- Templates (Hidden) -->
-    <template id="home-template">
-        <main class="max-w-6xl mx-auto px-8 md:px-12 pt-36 pb-20 fade-in">
-            <header class="mb-20 text-center">
-                <div class="max-w-2xl mx-auto">
-                    <h1 class="text-3xl md:text-5xl font-display font-extrabold text-slate-900 dark:text-white mb-6 leading-[1.15]">
-                        The intelligent hub for <br/>
-                        <span class="text-blue-600 dark:text-blue-500">modern academics.</span>
-                    </h1>
-                    <p class="text-[15px] md:text-base text-slate-500 dark:text-slate-400 font-normal leading-relaxed">
-                        Streamline your university experience with a unified administrative ecosystem. Smart support and efficient services.
-                    </p>
-                </div>
-            </header>
+    <div>
+        <label class="block mb-1 text-sm font-medium">Password (Birthdate)</label>
+        <input type="text" name="password" required
+               placeholder="dd/mm/yyyy"
+               class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-28">
-                <a href="#/assistant" class="premium-card rounded-2xl p-8 h-[250px]">
-                    <div>
-                        <div class="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-5 border border-blue-100 dark:border-blue-800/50">
-                            <i class="fa-solid fa-robot text-lg"></i>
-                        </div>
-                        <h2 class="text-2xl font-display font-bold text-slate-900 dark:text-white mb-2">Assistant AI</h2>
-                        <p class="text-slate-500 dark:text-slate-400 text-[14px] leading-relaxed max-w-[300px]">
-                            Intelligent guidance for your academic path and administrative needs.
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-[11px] font-bold uppercase tracking-widest mt-4">
-                        <span>Explore Assistant</span>
-                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                    </div>
-                </a>
+    <button type="submit"
+            class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition">
+        LOG IN
+    </button>
 
-                <a href="#/services" class="premium-card rounded-2xl p-8 h-[250px]">
-                    <div>
-                        <div class="w-11 h-11 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 mb-5 border border-slate-200 dark:border-slate-700">
-                            <i class="fa-solid fa-shapes text-lg"></i>
-                        </div>
-                        <h2 class="text-2xl font-display font-bold text-slate-900 dark:text-white mb-2">Our Services</h2>
-                        <p class="text-slate-500 dark:text-slate-400 text-[14px] leading-relaxed max-w-[300px]">
-                            Access registrations, official documents, and faculty admin.
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-[11px] font-bold uppercase tracking-widest mt-4">
-                        <span>View Catalog</span>
-                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                    </div>
-                </a>
-            </div>
+</form>
 
-            <footer class="border-t border-slate-200 dark:border-slate-800 pt-20">
-                <div class="text-center mb-12">
-                    <h2 class="text-2xl md:text-3xl font-display font-bold text-slate-900 dark:text-white mb-3">Connect with us</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Dedicated support for your university journey.</p>
-                </div>
-                <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-5">
-                    <div class="contact-item"><i class="fa-solid fa-envelope"></i><span>Email</span><p>help@unimate.edu</p></div>
-                    <div class="contact-item"><i class="fa-brands fa-telegram"></i><span>Telegram</span><p>@unimate_portal</p></div>
-                    <div class="contact-item"><i class="fa-solid fa-phone"></i><span>Hotline</span><p>800-UNIMATE</p></div>
-                    <div class="contact-item"><i class="fa-brands fa-facebook"></i><span>Facebook</span><p>UniMate Portal</p></div>
-                </div>
-                <div class="mt-20 text-center text-[11px] text-slate-400 uppercase tracking-[0.2em]">© 2026 UniMate Systems</div>
-            </footer>
-        </main>
-    </template>
+</div>
 
-    <template id="login-template">
-        <main class="flex-1 flex flex-col items-center justify-center min-h-screen p-6 sm:p-12 fade-in">
-            <!-- تصغير حجم الخط من 4xl/5xl/6xl إلى 3xl/4xl/5xl -->
-            <h1 class="text-3xl md:text-4xl lg:text-5xl font-display font-extrabold mb-10 text-center text-slate-900 dark:text-white pt-16 md:pt-20">
-                Student Portal
-            </h1>
-            <div class="w-full max-w-lg p-8 sm:p-10 rounded-2xl shadow-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                <form id="loginForm" class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium mb-2 text-slate-500 dark:text-slate-400">University Email</label>
-                        <input type="email" placeholder="name.surname@student.univ-temouchent.edu.dz" required 
-                               class="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/50 transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2 text-slate-500 dark:text-slate-400">Password (Birthdate)</label>
-                        <input type="text" id="dob" placeholder="dd/mm/yyyy" required maxlength="10"
-                               class="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/50 transition-all">
-                        <p class="text-xs mt-2 text-slate-400">Format: dd/mm/yyyy</p>
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-lg transition-all hover:shadow-lg active:scale-[0.98]">
-                        LOG IN
-                    </button>
-                </form>
-                <!-- تم إزالة رابط Back to home من داخل المربع -->
-            </div>
-        </main>
-    </template>
-
-    <script src="main.js"></script>
 </body>
-
 </html>
-
