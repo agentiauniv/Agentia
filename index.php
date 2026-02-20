@@ -1,47 +1,66 @@
 <?php
 session_start();
 
-$success = "";
-$error = "";
-$forceLogin = false;
+/* ==============================
+   CONFIGURATION SUPABASE
+================================= */
+$project_url = "https://uhqqzlpaybcyxrepisgi.supabase.co";
+$api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocXF6bHBheWJjeXhyZXBpc2dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NDAyNzgsImV4cCI6MjA4NjQxNjI3OH0.LNQMIQs7euI7-4MMJWU_maqT6WdXq6lWuueCtF3kE24"; // ⚠️ Mets ta clé ici
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+/* ==============================
+   LOGIN SUPABASE
+================================= */
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["login"])) {
 
-    $forceLogin = true;
+    $email = trim($_POST["email"]);
+    $password_input = trim($_POST["password"]);
 
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
+    $url = $project_url . "/rest/v1/login?select=*";
 
-    if (!empty($email) && !empty($password)) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "apikey: $api_key",
+        "Authorization: Bearer $api_key",
+        "Content-Type: application/json"
+    ]);
 
-        $supabase_url = "https://uhqqlzpaybcyxrepisgi.supabase.co/rest/v1/login";
-        $api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocXF6bHBheWJjeXhyZXBpc2dpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDg0MDI3OCwiZXhwIjoyMDg2NDE2Mjc4fQ.zgY2AsO71vrf5V1lWW0J35nUtut1qUvfvGTRAHFRz7Y
-";
+    $response = curl_exec($ch);
+    curl_close($ch);
 
-        $query = "?email=eq." . urlencode($email) . "&password=eq." . urlencode($password);
+    $data = json_decode($response, true);
+    $login_success = false;
 
-        $ch = curl_init($supabase_url . $query);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "apikey: $api_key",
-            "Authorization: Bearer $api_key",
-            "Content-Type: application/json"
-        ]);
+    if (is_array($data)) {
+        foreach ($data as $user) {
 
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        $data = json_decode($response, true);
-
-        if (!empty($data)) {
-            $success = "Connexion réussie ✅";
-        } else {
-            $error = "Email ou mot de passe incorrect ❌";
+            if (
+                trim($user["email"]) === $email &&
+                trim($user["password"]) === $password_input
+            ) {
+                $_SESSION["student_id"] = $user["Matricule"];
+                $_SESSION["email"] = $user["email"];
+                $login_success = true;
+                break;
+            }
         }
-    } else {
-        $error = "Veuillez remplir tous les champs ❌";
+    }
+
+    if (!$login_success) {
+        $error_message = "❌ Email ou mot de passe incorrect.";
     }
 }
+
+/* ==============================
+   LOGOUT
+================================= */
+if (isset($_GET["logout"])) {
+    session_destroy();
+    header("Location: index.php");
+    exit();
+}
+?>
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -140,3 +159,4 @@ window.location.hash = '#/login';
 <script src="main.js"></script>
 </body>
 </html>
+
