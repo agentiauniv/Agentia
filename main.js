@@ -6,15 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLoginBtn = document.getElementById('nav-login-btn');
     const html = document.documentElement;
 
-    // =============================
-    // 1. Theme Logic
-    // =============================
-
+    // Theme
     const initTheme = () => {
         const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        if (savedTheme === 'dark') {
             html.classList.add('dark');
             themeIcon.classList.replace('fa-moon', 'fa-sun');
         }
@@ -34,10 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =============================
-    // 2. Simple SPA Router
-    // =============================
-
+    // Router
     const routes = {
         '#/': 'home-template',
         '#/login': 'login-template'
@@ -54,46 +46,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (hash === '#/login') {
             navLoginBtn.textContent = 'BACK TO HOME';
             navLoginBtn.href = '#/';
+            initLoginLogic();
         } else {
             navLoginBtn.textContent = 'LOG IN';
             navLoginBtn.href = '#/login';
         }
-
-        if (hash === '#/login') initLoginLogic();
     };
 
     window.addEventListener('hashchange', renderView);
 
-    // =============================
-    // 3. Login Page Logic
-    // =============================
-
+    // Login logic (mask only — no preventDefault)
     const initLoginLogic = () => {
-
-        // Format date automatique
         const dobInput = document.getElementById('dob');
-        if (dobInput) {
-            dobInput.addEventListener('input', function (e) {
-                let v = e.target.value.replace(/\D/g, '').slice(0, 8);
 
+        if (dobInput) {
+            dobInput.addEventListener('input', function(e) {
+                let v = e.target.value.replace(/\D/g, '').slice(0, 8);
                 if (v.length >= 5) {
                     v = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4);
                 } else if (v.length >= 3) {
                     v = v.slice(0, 2) + '/' + v.slice(2);
                 }
-
                 e.target.value = v;
             });
         }
-
-        // ⚠️ IMPORTANT :
-        // On NE bloque PAS le formulaire
-        // On laisse PHP gérer l’authentification
     };
-
-    // =============================
-    // Initial Load
-    // =============================
 
     initTheme();
     renderView();
