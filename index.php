@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
 $success = "";
 $error = "";
 
@@ -10,20 +11,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = trim($_POST['password'] ?? '');
 
     $supabase_url = "https://uhqqlzpaybcyxrepisgi.supabase.co/rest/v1/login";
-    $api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocXF6bHBheWJjeXhyZXBpc2dpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDg0MDI3OCwiZXhwIjoyMDg2NDE2Mjc4fQ.zgY2AsO71vrf5V1lWW0J35nUtut1qUvfvGTRAHFRz7Y
-"; // mets ta vraie clé ici
+    $api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVocXF6bHBheWJjeXhyZXBpc2dpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDg0MDI3OCwiZXhwIjoyMDg2NDE2Mjc4fQ.zgY2AsO71vrf5V1lWW0J35nUtut1qUvfvGTRAHFRz7Y"; // PAS service_role
 
-    $query = $supabase_url . "?email=eq." . urlencode($email) . "&password=eq." . urlencode($password);
+    $query = $supabase_url
+        . "?email=eq." . urlencode($email)
+        . "&password=eq." . urlencode($password);
 
     $ch = curl_init($query);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "apikey: $api_key",
-        "Authorization: Bearer $api_key"
+        "Authorization: Bearer $api_key",
+        "Accept: application/json"
     ]);
 
     $response = curl_exec($ch);
-    
     curl_close($ch);
 
     $data = json_decode($response, true);
@@ -133,6 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 </body>
 </html>
+
 
 
 
